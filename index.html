@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍱 Restaurante Japonês</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI'; }
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .login-box { background: white; padding: 3rem; border-radius: 15px; text-align: center; }
+        .role-btn { padding: 1rem; font-size: 1.1rem; border: none; border-radius: 8px; cursor: pointer; color: white; margin: 0.5rem 0; }
+        .customer-btn { background: #3b82f6; }
+        .waiter-btn { background: #f59e0b; }
+        .kitchen-btn { background: #10b981; }
+        .header { background: rgba(0,0,0,0.2); color: white; padding: 1.5rem 2rem; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; padding: 2rem; }
+        .menu-card { background: white; border-radius: 10px; padding: 1.5rem; }
+        .tables-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; padding: 2rem; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        let role = null;
+        let cart = [];
+        let orders = [
+            { id: 1, table: 5, customer: 'João', items: [{name: 'Sushi', qty: 2}], status: 'preparing' },
+            { id: 2, table: 8, customer: 'Maria', items: [{name: 'Temaki', qty: 1}], status: 'pending' },
+        ];
+        const menuItems = [
+            { id: 1, name: '🍣 Sushi', price: 28.90 },
+            { id: 2, name: '🌮 Temaki', price: 18.90 },
+            { id: 3, name: '🍘 Fried Roll', price: 22.90 },
+            { id: 4, name: '🫘 Edamame', price: 12.90 },
+            { id: 5, name: '🍵 Chá', price: 6.90 },
+            { id: 6, name: '🍚 Arroz', price: 24.90 },
+        ];
+        function render() {
+            const root = document.getElementById('root');
+            if (role === null) {
+                root.innerHTML = `<div class="login-container"><div class="login-box"><h1>🍱</h1><h2>Restaurante</h2><button class="role-btn customer-btn" onclick="setRole('customer')">👥 Cliente</button><button class="role-btn waiter-btn" onclick="setRole('waiter')">🏃 Garçom</button><button class="role-btn kitchen-btn" onclick="setRole('kitchen')">👨‍🍳 Cozinha</button></div></div>`;
+            } else if (role === 'customer') {
+                root.innerHTML = `<div><h1>🍱 Menu</h1><button onclick="logout()">Sair</button><div class="menu-grid">${menuItems.map(item => `<div class="menu-card"><h3>${item.name}</h3><p>R$ ${item.price}</p><button onclick="addToCart(${item.id})">Adicionar</button></div>`).join('')}</div><h2>Carrinho (${cart.length})</h2><button onclick="submitOrder()">Enviar Pedido</button></div>`;
+            } else if (role === 'waiter') {
+                root.innerHTML = `<div><h1>🏃 Mesas</h1><button onclick="logout()">Sair</button><div class="tables-grid">${Array.from({length: 20}, (_, i) => `<div style="background: #ddd; padding: 1rem; text-align: center;">Mesa ${i+1}</div>`).join('')}</div></div>`;
+            } else if (role === 'kitchen') {
+                root.innerHTML = `<div><h1>👨‍🍳 Cozinha</h1><button onclick="logout()">Sair</button><div>${orders.map(o => `<div><p>Mesa ${o.table}: ${o.items.map(i => i.qty + 'x ' + i.name).join(', ')}</p><button onclick="updateStatus(${o.id}, 'ready')">Pronto</button></div>`).join('')}</div></div>`;
+            }
+        }
+        function setRole(r) { role = r; render(); }
+        function logout() { role = null; render(); }
+        function addToCart(id) { const item = menuItems.find(i => i.id === id); cart.push(item); render(); }
+        function submitOrder() { alert('Pedido enviado!'); cart = []; render(); }
+        function updateStatus(id, s) { render(); }
+        render();
+    </script>
+</body>
+</html>
